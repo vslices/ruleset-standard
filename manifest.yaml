@@ -1,6 +1,7 @@
 $schema: ./manifest.schema.json
 kind: vslices-ruleset
 version: 0.1
+name: vslices
 
 targets:
   csharp:
