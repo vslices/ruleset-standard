@@ -16,10 +16,10 @@ VSlices Ruleset Standard
 VSlices Tooling
   = execution and orchestration mechanisms
 
-project/.vslices/ruleset-standards/<name>
+project/.vslices/rulesets/<name>
   = named, imported lowering snapshot
 
-project/.vslices/ruleset-standards/local/<name>
+project/.vslices/rulesets/local/<name>
   = original, project-owned editable standard
 
 project/.vslices/extensions
@@ -58,7 +58,7 @@ csharp/
 ```yaml
 kind: vslices-ruleset
 version: 0.1
-name: vslices-ruleset-standard
+name: vslices
 ```
 
 The repository/CLI family is **Ruleset Standard**. The lower-level manifest `kind:
@@ -69,8 +69,8 @@ VSlices Tooling manages the lifecycle of multiple named installations. A consume
 can override the installation name without mutating this source manifest:
 
 ```text
-.vslices/ruleset-standards/
-  vslices-ruleset-standard/      # imported managed snapshot
+.vslices/rulesets/
+  vslices/      # imported managed snapshot
   local/
     my-team/                    # original, editable local standard
 ```
