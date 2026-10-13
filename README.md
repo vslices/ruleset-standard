@@ -1,6 +1,6 @@
-# VSlices Ruleset
+# VSlices Ruleset Standard
 
-VSlices Ruleset is the official, external source of lowering knowledge used by VSlices Tooling.
+VSlices Ruleset Standard is the official, external source of lowering knowledge used by VSlices Tooling.
 
 It describes how semantic structures represented by VSIR may be materialized for concrete targets without embedding target-specific lowering knowledge in the `vslices` executable.
 
@@ -10,14 +10,17 @@ The intended boundary is:
 VSIR
   = semantic source
 
-VSlices Ruleset
+VSlices Ruleset Standard
   = source-owned revisable lowering knowledge
 
 VSlices Tooling
   = execution and orchestration mechanisms
 
-project/.vslices/ruleset
-  = installed source-owned snapshot
+project/.vslices/ruleset-standards/<name>
+  = named, imported lowering snapshot
+
+project/.vslices/ruleset-standards/local/<name>
+  = original, project-owned editable standard
 
 project/.vslices/extensions
   = project-owned semantic extension overlay
@@ -48,23 +51,44 @@ csharp/
 
 `manifest.yaml` discovers target-specific rule files. `manifest.schema.json` describes that distributable snapshot. Project semantic extensions are deliberately **not** part of this manifest.
 
-## Project-local use
+## Named, coexisting installations
 
-`vslices init` materializes a Ruleset snapshot under:
+`manifest.yaml` declares the official standard identity:
 
-```text
-.vslices/ruleset/
+```yaml
+kind: vslices-ruleset
+version: 0.1
+name: vslices-ruleset-standard
 ```
 
-Lowering operates from that local state and does not require the network after materialization. The snapshot is suitable for version control as evidence of the installed lowering knowledge, but its lifecycle remains source-owned: `vslices init --force` and `vslices update --ruleset` may replace it.
+The repository/CLI family is **Ruleset Standard**. The lower-level manifest `kind:
+vslices-ruleset` is retained for schema compatibility; renaming the repository
+does not imply rewriting the rule language.
 
-Project-owned semantic extensions therefore live separately under:
+VSlices Tooling manages the lifecycle of multiple named installations. A consumer
+can override the installation name without mutating this source manifest:
 
 ```text
-.vslices/extensions/
+.vslices/ruleset-standards/
+  vslices-ruleset-standard/      # imported managed snapshot
+  local/
+    my-team/                    # original, editable local standard
 ```
 
-That overlay is owned by the consumer project and must survive Ruleset replacement. Tooling, rather than this repository, defines and validates the current project-extension catalog format.
+A new local standard can begin as `targets: {}` with no lowering rules. Adding
+a target to a local standard introduces target-specific rules under its own
+manifest. Empty standards are useful for progressive authoring but cannot
+perform target lowering until they admit validated rules.
+
+Separate rule sets may coexist, but **no implicit precedence** exists for
+overlapping `node` identifiers. Tooling must diagnose a collision instead of
+quietly replacing one definition with another. Project-owned extensions remain
+orthogonal under `.vslices/extensions`, never inside a distributable source.
+
+The historical single installation path `.vslices/ruleset` is recognized by
+Tooling during transition. The old command `vslices update ruleset` retains
+legacy meaning; `vslices new ruleset-standard --origin` installs named standards
+under the new layout.
 
 ## Evolution principle
 
